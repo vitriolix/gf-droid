@@ -9,10 +9,10 @@
     <color tools:ignore="UnusedResources" name="category_connectivity">#CBEFEC</color>
     <color tools:ignore="UnusedResources" name="category_development">#E2D6BC</color>
     <color tools:ignore="UnusedResources" name="category_games">#F3B569</color>
-    <color tools:ignore="UnusedResources" name="category_graphics">#F65A5A</color>
+    <color tools:ignore="UnusedResources" name="category_graphics">#562A0A</color>
     <color tools:ignore="UnusedResources" name="category_internet">#73EABC</color>
     <color tools:ignore="UnusedResources" name="category_money">#DDDDD0</color>
-    <color tools:ignore="UnusedResources" name="category_multimedia">#FF7F66</color>
+    <color tools:ignore="UnusedResources" name="category_multimedia">#FF0F66</color>
     <color tools:ignore="UnusedResources" name="category_navigation">#94D6FD</color>
     <color tools:ignore="UnusedResources" name="category_phone_sms">#F3CFC0</color>
     <color tools:ignore="UnusedResources" name="category_reading">#D6A07A</color>
@@ -21,7 +21,7 @@
     <color tools:ignore="UnusedResources" name="category_sports_health">#ADCEDE</color>
     <color tools:ignore="UnusedResources" name="category_system">#D3DB77</color>
     <color tools:ignore="UnusedResources" name="category_theming">#DEEFE9</color>
-    <color tools:ignore="UnusedResources" name="category_time">#FF7043</color>
+    <color tools:ignore="UnusedResources" name="category_time">#0F7043</color>
     <color tools:ignore="UnusedResources" name="category_writing">#F2E9CE</color>
 
     <color name="fdroid_blue_light">#ff63a4ff</color>
@@ -29,6 +29,14 @@
     <color name="fdroid_blue_dark">#ff004ba0</color>
     <color name="fdroid_green_light">#ffbee247</color>
     <color name="fdroid_green">#ff8ab000</color>
+
+    <color name="greatfire_red_1">#c41404</color>
+    <color name="greatfire_orange_1">#f36b04</color>
+    <color name="greatfire_light_orange_1">#f36b04</color>
+    <color name="greatfire_yellow_1">#F4A000</color>
+    <color name="greatfire_light_yellow_1">#88FFD179</color>
+    <color name="greatfire_blue_1">#1041A3</color>
+    <color name="greatfire_teal_1">#00968B</color>
 
     <color name="shadow">#cc222222</color>
 
