@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/greatfire_light_yellow_1"
+    >
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -16,10 +18,10 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/main_view_pager"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_navigation"
+        android:layout_alignParentTop="true"
         tools:listitem="@layout/main_tab_latest" />
 
 </RelativeLayout>
