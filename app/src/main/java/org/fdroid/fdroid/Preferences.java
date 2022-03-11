@@ -505,6 +505,16 @@ public final class Preferences implements SharedPreferences.OnSharedPreferenceCh
         return preferences.getString(PREF_PROXY_HOST, DEFAULT_PROXY_HOST);
     }
 
+    public void enableProxy() {
+        preferences.edit().putBoolean(PREF_ENABLE_PROXY, true).apply();
+        Log.d("FOO", "PROXY ENABLED");
+    }
+
+    public void disableProxy() {
+        preferences.edit().putBoolean(PREF_ENABLE_PROXY, false).apply();
+        Log.d("FOO", "PROXY DISABLED");
+    }
+
     public int getProxyPort() {
         final String port = preferences.getString(PREF_PROXY_PORT, String.valueOf(DEFAULT_PROXY_PORT));
         try {

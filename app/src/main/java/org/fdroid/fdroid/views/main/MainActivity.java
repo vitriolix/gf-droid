@@ -68,6 +68,8 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
+
 import android.util.Log;
 import org.greatfire.envoy.*;
 
@@ -123,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         // start proxy service
         Intent proxyIntent = new Intent(this, ProxyService.class);
         // put local proxy url here, can use socks5://127.0.0.1:1081 or any other available port
-        proxyIntent.putExtra("LOCAL_URL", "socks5://");
+        proxyIntent.putExtra("LOCAL_URL", "socks5://127.0.0.1:1081");
         // put socks or obfs4 url here. can include auth or certs
         proxyIntent.putExtra("PROXY_URL", "obfs4://");
         ContextCompat.startForegroundService(getApplicationContext(), proxyIntent);
@@ -169,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
         // start shadowsocks service
         Intent shadowsocksIntent = new Intent(this, ShadowsocksService.class);
         // put shadowsocks proxy url here, should look like ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpwYXNz@127.0.0.1:1234 (base64 encode user/password)
-        //shadowsocksIntent.putExtra("org.greatfire.envoy.START_SS_LOCAL", "ss://");
         shadowsocksIntent.putExtra("org.greatfire.envoy.START_SS_LOCAL", "ss://");
         ContextCompat.startForegroundService(getApplicationContext(), shadowsocksIntent);
 
@@ -177,12 +178,12 @@ public class MainActivity extends AppCompatActivity {
         String httpUrl = "http://.com/foo/";
         String httpsUrl = "https://.com/foo/";
         // include shadowsocks local proxy url (submitting local shadowsocks url with no active service may cause an exception)
-        String ssUrl = "socks5://";  // default shadowsocks url, change if there are port conflicts
-        String s5Url = "socks5://";
+        String ssUrl = "socks5://127.0.0.1:1080";  // default shadowsocks url, change if there are port conflicts
+        String s5Url = "socks5://127.0.0.1:1081";  // default socks5 url, change if there are port conflicts
 
         // TODO - it appears that only ip:port format proxies are supported by NetCipher (but allows http?)
-        // ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(httpUrl, httpsUrl, ssUrl));  // add all string values to this list value
-        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(s5Url));  // add all string values to this list value
+        // ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(httpUrl, httpsUrl, ssUrl, s5Url));  // add all string values to this list value
+        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(ssUrl, s5Url));  // add all string values to this list value
 
         NetworkIntentService.submit(this, possibleUrls);  // submit list of urls to envoy for evaluation
 
@@ -501,30 +502,51 @@ public class MainActivity extends AppCompatActivity {
     private final BroadcastReceiver onUrlsReceived = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //override fun onReceive(context: Context?, intent: Intent?) {
+            boolean enableProxy = false;
+
             if (intent != null && context != null) {
                 ArrayList<String> validUrls = intent.getStringArrayListExtra(EXTENDED_DATA_VALID_URLS);
-                // if there are no valid urls, initializeCronetEngine will not be called
-                // the app will start normally and connect to the internet directly if possible
+                // if there are no valid urls, the proxy setting in preferences will be disabled
+                // currently there is a delay when using gost and the app must be restarted
                 if (validUrls != null && !validUrls.isEmpty()) {
+                    // select the fastest valid option (urls are ordered by latency)
                     String envoyUrl = validUrls.get(0);
-                    // select the fastest one (urls are ordered by latency), reInitializeIfNeeded set to false
-                    //CronetNetworking.initializeCronetEngine(context, envoyUrl)
 
-                    // TODO - set proxy url in NetCipher?
                     Log.d("FOO", "FOUND VALID URL: " + envoyUrl);
 
-                    // TODO - split/parse valid url
-                    // NetCipher.setProxy("127.0.0.1", 1080);
-                    // TEMP - seems to force HTTP proxy?
-                    InetSocketAddress isa = new InetSocketAddress("127.0.0.1", 1080);
-                    NetCipher.setProxy(new Proxy(Proxy.Type.SOCKS, isa));
+                    // format expected: <protocol>://x.x.x.x:y
+                    String[] urlParts = envoyUrl.split(":");
+                    if (urlParts.length != 3) {
+                        Log.d("FOO", "UNEXPECTED URL FORMAT");
+                    } else {
+                        String protocolPart = urlParts[0].toLowerCase(Locale.ROOT);
+                        String hostPart = urlParts[1].replace("//", "");
+                        int portPart = Integer.valueOf(urlParts[2]);
 
+                        if (protocolPart.startsWith("s")) {
+                            Log.d("FOO", "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
+                            NetCipher.setProxy(new Proxy(Proxy.Type.SOCKS, isa));
+                            enableProxy = true;
+                        } else if (protocolPart.startsWith("h")) {
+                            Log.d("FOO", "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
+                            NetCipher.setProxy(new Proxy(Proxy.Type.HTTP, isa));
+                            enableProxy = true;
+                        } else {
+                            Log.d("FOO", "UNEXPECTED URL PROTOCOL");
+                        }
+                    }
                 } else {
                     Log.d("FOO", "NO VALID URL FOUND");
                 }
             }
-            //}
+
+            if (enableProxy) {
+                Preferences.get().enableProxy();
+            } else {
+                Preferences.get().disableProxy();
+            }
         }
     };
 }
