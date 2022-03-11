@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 
@@ -21,7 +22,7 @@ def basicApplicationId = "org.fdroid.basic"
 def privilegedExtensionApplicationId = '"org.fdroid.fdroid.privileged"'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         versionCode 1014050
@@ -30,7 +31,7 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         minSdkVersion 22
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 25
+        targetSdkVersion 31
         /*
           The Android Testing Support Library collects analytics to continuously improve the testing
           experience. More specifically, it uploads a hash of the package name of the application
@@ -200,6 +201,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
     androidTestImplementation 'androidx.work:work-testing:2.4.0'
+
+    debugImplementation files('libs/cronet-debug.aar')
+    debugImplementation files('libs/envoy-debug.aar')
+    releaseImplementation files('libs/cronet-release.aar')
+    releaseImplementation files('libs/envoy-release.aar')
+    implementation "androidx.core:core-ktx:1.7.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 checkstyle {
@@ -238,3 +246,6 @@ task pmdTest(type: Pmd) {
 }
 
 task pmd(dependsOn: [pmdMain, pmdTest]) {}
+repositories {
+    mavenCentral()
+}

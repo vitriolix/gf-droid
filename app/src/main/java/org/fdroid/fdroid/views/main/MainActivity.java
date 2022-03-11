@@ -59,9 +59,19 @@ import org.fdroid.fdroid.nearby.SwapService;
 import org.fdroid.fdroid.nearby.SwapWorkflowActivity;
 import org.fdroid.fdroid.nearby.TreeUriScannerIntentService;
 import org.fdroid.fdroid.nearby.WifiStateChangeService;
+import org.fdroid.fdroid.net.ProxyService;
 import org.fdroid.fdroid.views.AppDetailsActivity;
 import org.fdroid.fdroid.views.ManageReposActivity;
 import org.fdroid.fdroid.views.apps.AppListActivity;
+
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import android.util.Log;
+import org.greatfire.envoy.*;
+
+import info.guardianproject.netcipher.NetCipher;
 
 /**
  * Main view shown to users upon starting F-Droid.
@@ -99,12 +109,24 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigation;
     private BadgeDrawable updatesBadge;
 
+    // copied from org.greatfire.envoy.NetworkIntentService.kt, could not be found in imported class
+    public static final String BROADCAST_VALID_URL_FOUND = "org.greatfire.envoy.VALID_URL_FOUND";
+    public static final String EXTENDED_DATA_VALID_URLS = "org.greatfire.envoy.VALID_URLS";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         FDroidApp fdroidApp = (FDroidApp) getApplication();
         fdroidApp.applyPureBlackBackgroundInDarkTheme(this);
 
         super.onCreate(savedInstanceState);
+
+        // start proxy service
+        Intent proxyIntent = new Intent(this, ProxyService.class);
+        // put local proxy url here, can use socks5://127.0.0.1:1081 or any other available port
+        proxyIntent.putExtra("LOCAL_URL", "socks5://");
+        // put socks or obfs4 url here. can include auth or certs
+        proxyIntent.putExtra("PROXY_URL", "obfs4://");
+        ContextCompat.startForegroundService(getApplicationContext(), proxyIntent);
 
         setContentView(R.layout.activity_main);
 
@@ -140,6 +162,29 @@ public class MainActivity extends AppCompatActivity {
         updateableAppsFilter.addAction(AppUpdateStatusManager.BROADCAST_APPSTATUS_CHANGED);
         updateableAppsFilter.addAction(AppUpdateStatusManager.BROADCAST_APPSTATUS_REMOVED);
         LocalBroadcastManager.getInstance(this).registerReceiver(onUpdateableAppsChanged, updateableAppsFilter);
+
+        // register to receive valid proxy urls
+        LocalBroadcastManager.getInstance(this).registerReceiver(onUrlsReceived, new IntentFilter(BROADCAST_VALID_URL_FOUND));
+
+        // start shadowsocks service
+        Intent shadowsocksIntent = new Intent(this, ShadowsocksService.class);
+        // put shadowsocks proxy url here, should look like ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpwYXNz@127.0.0.1:1234 (base64 encode user/password)
+        //shadowsocksIntent.putExtra("org.greatfire.envoy.START_SS_LOCAL", "ss://");
+        shadowsocksIntent.putExtra("org.greatfire.envoy.START_SS_LOCAL", "ss://");
+        ContextCompat.startForegroundService(getApplicationContext(), shadowsocksIntent);
+
+        // TODO - initialize one or more string values containing the urls of available http/https proxies (include trailing slash)
+        String httpUrl = "http://.com/foo/";
+        String httpsUrl = "https://.com/foo/";
+        // include shadowsocks local proxy url (submitting local shadowsocks url with no active service may cause an exception)
+        String ssUrl = "socks5://";  // default shadowsocks url, change if there are port conflicts
+        String s5Url = "socks5://";
+
+        // TODO - it appears that only ip:port format proxies are supported by NetCipher (but allows http?)
+        // ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(httpUrl, httpsUrl, ssUrl));  // add all string values to this list value
+        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(s5Url));  // add all string values to this list value
+
+        NetworkIntentService.submit(this, possibleUrls);  // submit list of urls to envoy for evaluation
 
         initialRepoUpdateIfRequired();
 
@@ -448,6 +493,38 @@ public class MainActivity extends AppCompatActivity {
 
                 refreshUpdatesBadge(count);
             }
+        }
+    };
+
+    // this receiver listens for the results from the NetworkIntentService started below
+    // it should receive a result if no valid urls are found but not if the service throws an exception
+    private final BroadcastReceiver onUrlsReceived = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent != null && context != null) {
+                ArrayList<String> validUrls = intent.getStringArrayListExtra(EXTENDED_DATA_VALID_URLS);
+                // if there are no valid urls, initializeCronetEngine will not be called
+                // the app will start normally and connect to the internet directly if possible
+                if (validUrls != null && !validUrls.isEmpty()) {
+                    String envoyUrl = validUrls.get(0);
+                    // select the fastest one (urls are ordered by latency), reInitializeIfNeeded set to false
+                    //CronetNetworking.initializeCronetEngine(context, envoyUrl)
+
+                    // TODO - set proxy url in NetCipher?
+                    Log.d("FOO", "FOUND VALID URL: " + envoyUrl);
+
+                    // TODO - split/parse valid url
+                    // NetCipher.setProxy("127.0.0.1", 1080);
+                    // TEMP - seems to force HTTP proxy?
+                    InetSocketAddress isa = new InetSocketAddress("127.0.0.1", 1080);
+                    NetCipher.setProxy(new Proxy(Proxy.Type.SOCKS, isa));
+
+                } else {
+                    Log.d("FOO", "NO VALID URL FOUND");
+                }
+            }
+            //}
         }
     };
 }

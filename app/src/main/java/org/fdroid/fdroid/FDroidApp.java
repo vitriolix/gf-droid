@@ -585,10 +585,18 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
      */
     public static void configureProxy(Preferences preferences) {
         if (preferences.isTorEnabled()) {
+            Log.d("FOO", "USING TOR PROXY");
             NetCipher.useTor();
         } else if (preferences.isProxyEnabled()) {
-            NetCipher.setProxy(preferences.getProxyHost(), preferences.getProxyPort());
+            // TEMP - if a valid proxy was found it should have been set at startup
+            // NetCipher.setProxy(preferences.getProxyHost(), preferences.getProxyPort());
+            if (NetCipher.getProxy() == null) {
+                Log.d("FOO", "PROXY ENABLED BUT NO CURRENT PROXY");
+            } else {
+                Log.d("FOO", "CURRENT PROXY: " + NetCipher.getProxy().type() + " / " + NetCipher.getProxy().address());
+            }
         } else {
+            Log.d("FOO", "PROXY DISABLED, CLEAR PROXY");
             NetCipher.clearProxy();
         }
     }
