@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="app_name">F-Droid</string>
-    <string name="app_name_debug" translatable="false">F-Droid Debug</string>
+    <string name="app_name">GF-Droid</string>
+    <string name="app_name_debug" translatable="false">GF-Droid Debug</string>
 
     <string name="SignatureMismatch">The new version is signed with a different key to the old one. To install the new
         version, the old one must be uninstalled first. Please do this and try again. (Note that uninstalling will erase
@@ -39,8 +39,8 @@
     <string name="keep_install_history">Keep install history</string>
     <string name="keep_install_history_summary">Store a log of all installs and uninstalls in a private store</string>
     <string name="send_to_fdroid_metrics">Send usage data</string>
-    <string name="send_to_fdroid_metrics_summary">Sends anonymous data weekly to F-Droid Metrics (requires "Keep install history")</string>
-    <!-- message shown as a "toast" when the user enables the Send to F-Droid Metrics preference -->
+    <string name="send_to_fdroid_metrics_summary">Sends anonymous data weekly to GF-Droid Metrics (requires "Keep install history")</string>
+    <!-- message shown as a "toast" when the user enables the Send to GF-Droid Metrics preference -->
     <string name="toast_metrics_in_install_history">The %s Metric report is viewable in the Install History viewer</string>
     <string name="send_version_and_uuid">Send version and UUID to servers</string>
     <string name="send_version_and_uuid_summary">Include this app\'s version and a random, unique ID when
@@ -101,7 +101,7 @@
 
 This often occurs with apps installed via Google Play or other sources, if they are signed by a different certificate.</string>
 
-    <string name="about_title">About F-Droid</string>
+    <string name="about_title">About GF-Droid</string>
     <string name="about_version">Version</string>
     <string name="about_site">Website</string>
     <string name="about_forum">Support forum</string>
@@ -122,7 +122,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
     <string name="app__tts__cancel_download">Cancel download</string>
     <string name="app__install_downloaded_update">Update</string>
     <string name="app_installed_media">File installed to %s</string>
-    <string name="app_permission_storage">F-Droid needs the storage permission to install this to storage. Please allow it on the next screen to proceed with installation.</string>
+    <string name="app_permission_storage">GF-Droid needs the storage permission to install this to storage. Please allow it on the next screen to proceed with installation.</string>
     <string name="app_repository">Repository: %1$s</string>
     <string name="app_size">Size: %1$s</string>
 
@@ -137,7 +137,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
     <string name="installed_apps__activity_title">Installed Apps</string>
     <!-- Should be exactly the same as the standard word for "Share" throughout Android and apps -->
     <string name="send_installed_apps">Share installed apps</string>
-    <string name="send_installed_apps_csv">Apps installed by F-Droid as CSV file</string>
+    <string name="send_installed_apps_csv">Apps installed by GF-Droid as CSV file</string>
     <string name="installed_app__updates_ignored">Updates ignored</string>
     <string name="installed_app__updates_ignored_for_suggested_version">Updates ignored for Version %1$s</string>
 
@@ -330,7 +330,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
     <string name="force_touch_apps_on">Show apps that require touchscreen regardless of hardware support</string>
 
     <string name="local_repo">Local Repo</string>
-    <string name="local_repo_running">F-Droid is ready to swap</string>
+    <string name="local_repo_running">GF-Droid is ready to swap</string>
     <string name="touch_to_configure_local_repo">Touch to view details and allow others to swap your apps.</string>
     <string name="deleting_repo">Deleting current repo…</string>
     <string name="adding_apks_format">Adding %s to repo…</string>
@@ -491,7 +491,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
     </plurals>
 
     <string name="empty_installed_app_list">No apps installed.\n\nThere are apps on your device, but they are not
-        available from F-Droid. This could be because you need to update your repositories, or the repositories
+        available from GF-Droid. This could be because you need to update your repositories, or the repositories
         genuinely don\'t have your apps available.
     </string>
     <string name="empty_can_update_app_list">Congratulations!\nYour apps are up to date.</string>
@@ -517,7 +517,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
 
     <!-- This is a screen title, it should be maximum 25 characters -->
     <string name="swap_nfc_title">Touch to swap</string>
-    <string name="swap_nfc_description">If your friend has F-Droid and NFC turned on touch your devices together.
+    <string name="swap_nfc_description">If your friend has GF-Droid and NFC turned on touch your devices together.
     </string>
     <string name="swap_join_same_wifi">Join the same Wi-Fi as your friend</string>
     <string name="swap_join_same_wifi_desc">To swap using Wi-Fi, ensure you are on the same network. If you don\'t have
@@ -538,7 +538,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
     <string name="swap_view_available_networks">Tap to open available networks</string>
     <string name="swap_switch_to_wifi">Tap to switch to a Wi-Fi network</string>
     <string name="open_qr_code_scanner">Open QR Scanner</string>
-    <string name="swap_welcome">Welcome to F-Droid!</string>
+    <string name="swap_welcome">Welcome to GF-Droid!</string>
     <string name="swap_confirm_connect">Do you want to get apps from %1$s now?</string>
     <string name="swap_dont_show_again">Don\'t show this again</string>
     <string name="swap_scan_or_type_url">One person needs to scan the code, or type the URL of the other in a browser.
@@ -567,7 +567,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
     <string name="swap_wifi_device_name">Device Name</string>
     <string name="swap_cant_find_peers">Can\'t find who you\'re looking for?</string>
     <!-- This is a button label, it must be the right size, or the layout gets messed up. It should be less than 15 characters. -->
-    <string name="swap_send_fdroid">Send F-Droid</string>
+    <string name="swap_send_fdroid">Send GF-Droid</string>
     <string name="apps">Apps</string>
     <string name="swap_no_peers_nearby">Could not find people nearby to swap with.</string>
     <!-- This is a screen title, it should be maximum 25 characters -->
@@ -651,7 +651,7 @@ This often occurs with apps installed via Google Play or other sources, if they 
     <string name="theme_dark">Dark</string>
     <string name="theme_follow_system">Follow system</string>
 
-    <string name="crash_dialog_title">F-Droid has crashed</string>
+    <string name="crash_dialog_title">GF-Droid has crashed</string>
     <string name="crash_dialog_text">An unexpected error occurred
         forcing the app to stop. Would you like to e-mail the
         details to help fix the issue?
