@@ -4,5 +4,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--required to enable/disable system animations from the app itself during Espresso test runs-->
-    <uses-permission android:name="android.permission.SET_ANIMATION_SCALE" />
+    <uses-permission android:exported="true" android:name="android.permission.SET_ANIMATION_SCALE" />
 </manifest>
