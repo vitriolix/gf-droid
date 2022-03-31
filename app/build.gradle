@@ -157,12 +157,6 @@ android {
         exclude 'META-INF/INDEX.LIST'
         exclude '.readme'
     }
-    externalNativeBuild {
-        cmake {
-            path file('src/main/cpp/CMakeLists.txt')
-            version '3.18.1'
-        }
-    }
 }
 
 dependencies {
