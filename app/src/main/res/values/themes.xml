@@ -34,10 +34,10 @@
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
-        <item name="colorPrimary">@color/greatfire_orange_1</item>
-        <item name="colorPrimaryVariant">@color/greatfire_yellow_1</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryVariant">@color/color_primary_alt</item>
         <item name="colorPrimaryDark">?colorPrimaryVariant</item>
-        <item name="colorSecondary">@color/greatfire_red_1</item>
+        <item name="colorSecondary">@color/color_secondary</item>
         <!--colorBackground appears behind scrollable content and is used for the default window-->
         <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
         <!--and menus. colorError is used to indicate an error state for components such as-->
@@ -78,6 +78,9 @@
     <!-- light app theme with accent colors following roughly android design guidelines -->
     <style name="Theme.App" parent="Base.Theme.App">
         <!-- customizations that are not API-level specific go here. -->
+        <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.Colored</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorOnPrimary">@color/color_secondary_300</item>
     </style>
 
     <!-- Same as Theme.App except a black background in Dark mode -->

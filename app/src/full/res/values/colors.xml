@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <color name="background">?attr/colorPrimary</color>
+    <color name="color_primary">#361659</color>
+    <color name="color_primary_alt">#673CA7</color>
+    <color name="color_secondary">#F1B807</color>
+    <color name="color_secondary_300">#F2C437</color>
+    <color name="color_secondary_alt">#D98104</color>
+    <color name="color_tertiary">#715163</color>
 
     <color name="swap_incompatible">#ff7900</color>
     <color name="swap_light_blue">#27aae1</color>
