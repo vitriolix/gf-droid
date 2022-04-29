@@ -25,7 +25,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 
-import org.acra.ACRA;
+//import org.acra.ACRA;
 import org.fdroid.fdroid.Utils;
 
 import java.io.ByteArrayOutputStream;
@@ -56,11 +56,11 @@ class ApkSignatureVerifier {
 
     public boolean hasFDroidSignature(File apkFile) {
         if (!apkFile.exists()) {
-            ACRA.getErrorReporter().handleException(
-                    new Exception("Failed to install Privileged Extension, because " + apkFile.getAbsolutePath()
-                            + " does not exist."),
-                    false
-            );
+//            ACRA.getErrorReporter().handleException(
+//                    new Exception("Failed to install Privileged Extension, because " + apkFile.getAbsolutePath()
+//                            + " does not exist."),
+//                    false
+//            );
 
             return false;
         }
