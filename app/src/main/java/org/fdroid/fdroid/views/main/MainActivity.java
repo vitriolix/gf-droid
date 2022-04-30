@@ -59,7 +59,6 @@ import org.fdroid.fdroid.nearby.SwapService;
 import org.fdroid.fdroid.nearby.SwapWorkflowActivity;
 import org.fdroid.fdroid.nearby.TreeUriScannerIntentService;
 import org.fdroid.fdroid.nearby.WifiStateChangeService;
-import org.fdroid.fdroid.net.ProxyService;
 import org.fdroid.fdroid.views.AppDetailsActivity;
 import org.fdroid.fdroid.views.ManageReposActivity;
 import org.fdroid.fdroid.views.apps.AppListActivity;
@@ -122,14 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        // start proxy service
-        Intent proxyIntent = new Intent(this, ProxyService.class);
-        // put local proxy url here, can use socks5://127.0.0.1:1081 or any other available port
-        proxyIntent.putExtra("LOCAL_URL", "socks5://127.0.0.1:1081");
-        // put socks or obfs4 url here. can include auth or certs
-        proxyIntent.putExtra("PROXY_URL", "obfs4://");
-        ContextCompat.startForegroundService(getApplicationContext(), proxyIntent);
-
         setContentView(R.layout.activity_main);
 
         adapter = new MainViewAdapter(this);
@@ -171,23 +162,21 @@ public class MainActivity extends AppCompatActivity {
         // start shadowsocks service
         Intent shadowsocksIntent = new Intent(this, ShadowsocksService.class);
         // put shadowsocks proxy url here, should look like ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpwYXNz@127.0.0.1:1234 (base64 encode user/password)
-        shadowsocksIntent.putExtra("org.greatfire.envoy.START_SS_LOCAL", "ss://");
+        shadowsocksIntent.putExtra("org.greatfire.envoy.START_SS_LOCAL", "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTppZXNvaHZvOHh1Nm9oWW9yaWUydGhhZWhvaFBoOFRoYQ==@172.104.163.54:8388");
         ContextCompat.startForegroundService(getApplicationContext(), shadowsocksIntent);
 
         // TODO - initialize one or more string values containing the urls of available http/https proxies (include trailing slash)
-        String httpUrl = "http://.com/foo/";
-        String httpsUrl = "https://.com/foo/";
+        String httpUrl = "http://162.159.137.85:80/";
+
         // include shadowsocks local proxy url (submitting local shadowsocks url with no active service may cause an exception)
         String ssUrl = "socks5://127.0.0.1:1080";  // default shadowsocks url, change if there are port conflicts
-        String s5Url = "socks5://127.0.0.1:1081";  // default socks5 url, change if there are port conflicts
 
-        // TODO - it appears that only ip:port format proxies are supported by NetCipher (but allows http?)
-        // ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(httpUrl, httpsUrl, ssUrl, s5Url));  // add all string values to this list value
-        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(ssUrl, s5Url));  // add all string values to this list value
-
+        // TODO - it appears that only ip:port format proxies are supported by NetCipher
+        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(httpUrl, ssUrl));  // add all string values to this list value
         NetworkIntentService.submit(this, possibleUrls);  // submit list of urls to envoy for evaluation
 
-        initialRepoUpdateIfRequired();
+        // delay until after proxy urls have been validated
+        // initialRepoUpdateIfRequired();
 
         Intent intent = getIntent();
         handleSearchOrAppViewIntent(intent);
@@ -512,41 +501,47 @@ public class MainActivity extends AppCompatActivity {
                     // select the fastest valid option (urls are ordered by latency)
                     String envoyUrl = validUrls.get(0);
 
-                    Log.d("FOO", "FOUND VALID URL: " + envoyUrl);
+                    Log.d(TAG, "FOUND VALID URL: " + envoyUrl);
 
                     // format expected: <protocol>://x.x.x.x:y
                     String[] urlParts = envoyUrl.split(":");
                     if (urlParts.length != 3) {
-                        Log.d("FOO", "UNEXPECTED URL FORMAT");
+                        Log.d(TAG, "UNEXPECTED URL FORMAT");
                     } else {
                         String protocolPart = urlParts[0].toLowerCase(Locale.ROOT);
                         String hostPart = urlParts[1].replace("//", "");
-                        int portPart = Integer.valueOf(urlParts[2]);
+                        int portPart = Integer.valueOf(urlParts[2].replace("/", ""));
 
                         if (protocolPart.startsWith("s")) {
-                            Log.d("FOO", "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            Log.d(TAG, "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
                             InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
                             NetCipher.setProxy(new Proxy(Proxy.Type.SOCKS, isa));
                             enableProxy = true;
                         } else if (protocolPart.startsWith("h")) {
-                            Log.d("FOO", "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            Log.d(TAG, "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
                             InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
                             NetCipher.setProxy(new Proxy(Proxy.Type.HTTP, isa));
                             enableProxy = true;
                         } else {
-                            Log.d("FOO", "UNEXPECTED URL PROTOCOL");
+                            Log.d(TAG, "UNEXPECTED URL PROTOCOL");
                         }
                     }
                 } else {
-                    Log.d("FOO", "NO VALID URL FOUND");
+                    Log.d(TAG, "NO VALID URL FOUND");
                 }
             }
+
+            Log.d(TAG, "ENABLE/DISABLE");
 
             if (enableProxy) {
                 Preferences.get().enableProxy();
             } else {
                 Preferences.get().disableProxy();
             }
+
+            Log.d(TAG, "NOW DO REPO UPDATE");
+
+            initialRepoUpdateIfRequired();
         }
     };
 }

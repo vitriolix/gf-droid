@@ -76,7 +76,8 @@
         <activity
             android:name=".panic.PanicPreferencesActivity"
             android:label="@string/panic_settings"
-            android:parentActivityName=".views.main.MainActivity">
+            android:parentActivityName=".views.main.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="info.guardianproject.panic.action.CONNECT" />
                 <action android:name="info.guardianproject.panic.action.DISCONNECT" />
@@ -96,7 +97,8 @@
         <activity
             android:name=".panic.PanicResponderActivity"
             android:noHistory="true"
-            android:theme="@android:style/Theme.NoDisplay">
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true">
 
             <!-- this can never have launchMode singleTask or singleInstance! -->
             <intent-filter>
@@ -113,25 +115,29 @@
             android:name=".panic.CalculatorActivity"
             android:enabled="false"
             android:icon="@mipmap/ic_calculator_launcher"
-            android:label="@string/hiding_calculator">
+            android:label="@string/hiding_calculator"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".nearby.WifiStateChangeReceiver">
+        <receiver android:name=".nearby.WifiStateChangeReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.DeviceStorageReceiver">
+        <receiver android:name=".receiver.DeviceStorageReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".nearby.UsbDeviceAttachedReceiver">
+        <receiver android:name=".nearby.UsbDeviceAttachedReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
@@ -139,7 +145,8 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
         </receiver>
-        <receiver android:name=".nearby.UsbDeviceDetachedReceiver">
+        <receiver android:name=".nearby.UsbDeviceDetachedReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
             </intent-filter>
@@ -147,7 +154,8 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"
                 android:resource="@xml/device_filter" />
         </receiver>
-        <receiver android:name=".nearby.UsbDeviceMediaMountedReceiver">
+        <receiver android:name=".nearby.UsbDeviceMediaMountedReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_EJECT" />
                 <action android:name="android.intent.action.MEDIA_REMOVED" />

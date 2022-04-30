@@ -336,6 +336,7 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
         } else {
             currentLocale = newConfig.getLocales().toString();
         }
+        Log.d(TAG, lastLocale + " / " + currentLocale);
         if (!TextUtils.equals(lastLocale, currentLocale)) {
             UpdateService.forceUpdateRepo(this);
         }
@@ -408,6 +409,7 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
         preferences.registerAppsRequiringAntiFeaturesChangeListener(new Preferences.ChangeListener() {
             @Override
             public void onPreferenceChange() {
+                Log.d(TAG, "AppsRequiringAntiFeaturesChangeListener");
                 getContentResolver().notifyChange(AppProvider.getContentUri(), null);
             }
         });
@@ -415,6 +417,7 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
         preferences.registerUnstableUpdatesChangeListener(new Preferences.ChangeListener() {
             @Override
             public void onPreferenceChange() {
+                Log.d(TAG, "UnstableUpdatesChangeListener");
                 AppProvider.Helper.calcSuggestedApks(FDroidApp.this);
             }
         });
@@ -424,9 +427,13 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
         notificationHelper = new NotificationHelper(getApplicationContext());
 
         if (preferences.isIndexNeverUpdated()) {
+            Log.d(TAG, "isIndexNeverUpdated: " + preferences.isIndexNeverUpdated());
             preferences.setDefaultForDataOnlyConnection(this);
             // force this check to ensure it starts fetching the index on initial runs
             networkState = ConnectivityMonitorService.getNetworkState(this);
+            Log.d(TAG, "networkState: " + networkState);
+        } else {
+            Log.d(TAG, "isIndexNeverUpdated: " + preferences.isIndexNeverUpdated());
         }
         ConnectivityMonitorService.registerAndStart(this);
         UpdateService.schedule(getApplicationContext());
@@ -437,6 +444,7 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
         preferences.registerLocalRepoHttpsListeners(new ChangeListener() {
             @Override
             public void onPreferenceChange() {
+                Log.d(TAG, "LocalRepoHttpsListeners");
                 WifiStateChangeService.start(getApplicationContext(), null);
             }
         });
@@ -584,19 +592,20 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
      * Must be called on App startup and after every proxy configuration change.
      */
     public static void configureProxy(Preferences preferences) {
+        Log.d(TAG, "CONFIGURE PROXY");
         if (preferences.isTorEnabled()) {
-            Log.d("FOO", "USING TOR PROXY");
+            Log.d(TAG, "USING TOR PROXY");
             NetCipher.useTor();
         } else if (preferences.isProxyEnabled()) {
             // TEMP - if a valid proxy was found it should have been set at startup
             // NetCipher.setProxy(preferences.getProxyHost(), preferences.getProxyPort());
             if (NetCipher.getProxy() == null) {
-                Log.d("FOO", "PROXY ENABLED BUT NO CURRENT PROXY");
+                Log.d(TAG, "PROXY ENABLED BUT NO CURRENT PROXY");
             } else {
-                Log.d("FOO", "CURRENT PROXY: " + NetCipher.getProxy().type() + " / " + NetCipher.getProxy().address());
+                Log.d(TAG, "CURRENT PROXY: " + NetCipher.getProxy().type() + " / " + NetCipher.getProxy().address());
             }
         } else {
-            Log.d("FOO", "PROXY DISABLED, CLEAR PROXY");
+            Log.d(TAG, "PROXY DISABLED, CLEAR PROXY");
             NetCipher.clearProxy();
         }
     }
