@@ -105,6 +105,7 @@ public class UpdateService extends JobIntentService {
     }
 
     public static void updateRepoNow(Context context, String address) {
+        Log.d(TAG, "FORCE REPO NOW - " + address);
         Intent intent = new Intent(context, UpdateService.class);
         intent.putExtra(EXTRA_MANUAL_UPDATE, true);
         if (!TextUtils.isEmpty(address)) {
@@ -119,6 +120,7 @@ public class UpdateService extends JobIntentService {
      * This wipes the existing database before running the update!
      */
     public static void forceUpdateRepo(Context context) {
+        Log.d(TAG, "FORCE UPDATE REPO");
         Intent intent = new Intent(context, UpdateService.class);
         intent.putExtra(EXTRA_FORCED_UPDATE, true);
         enqueueWork(context, intent);
@@ -265,12 +267,15 @@ public class UpdateService extends JobIntentService {
      * updated and used without using the Internet.
      */
     public static List<Repo> getLocalRepos(List<Repo> repos) {
+        Log.d(TAG, "GET LOCAL REPOS");
         ArrayList<Repo> localRepos = new ArrayList<>();
         for (Repo repo : repos) {
             if (isLocalRepoAddress(repo.address)) {
+                Log.d(TAG, "LOCAL REPO: " + repo.address);
                 localRepos.add(repo);
             } else {
                 for (String mirrorAddress : repo.getMirrorList()) {
+                    Log.d(TAG, "REPO MIRROR: " + mirrorAddress);
                     if (isLocalRepoAddress(mirrorAddress)) {
                         localRepos.add(repo);
                         break;
@@ -347,6 +352,8 @@ public class UpdateService extends JobIntentService {
             final String message = intent.getStringExtra(EXTRA_MESSAGE);
             int resultCode = intent.getIntExtra(EXTRA_STATUS_CODE, -1);
             int progress = intent.getIntExtra(EXTRA_PROGRESS, -1);
+
+            Log.d(TAG, "RESULT: " + resultCode + " / " + message);
 
             String text;
             switch (resultCode) {

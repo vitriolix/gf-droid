@@ -50,9 +50,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".FDroidApp"
@@ -141,7 +143,8 @@
         <activity
             android:name=".views.main.MainActivity"
             android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -504,14 +507,16 @@
             android:exported="false"
             tools:node="remove" />
 
-        <receiver android:name=".receiver.StartupReceiver">
+        <receiver android:name=".receiver.StartupReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
 
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.PackageManagerReceiver">
+        <receiver android:name=".receiver.PackageManagerReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_CHANGED" />
@@ -525,7 +530,8 @@
             android:exported="false">
             <!-- Doesn't require an intent-filter because it is explicitly invoked via Intent.setClass() -->
         </receiver>
-        <receiver android:name=".receiver.DeviceStorageReceiver">
+        <receiver android:name=".receiver.DeviceStorageReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
             </intent-filter>
@@ -574,6 +580,14 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".AddRepoIntentService"
+            android:exported="false" />
+
+        <service
+            android:name="org.greatfire.envoy.ShadowsocksService"
+            android:exported="false"
+            android:isolatedProcess="false" />
+        <service
+            android:name="org.greatfire.envoy.NetworkIntentService"
             android:exported="false" />
 
     </application>

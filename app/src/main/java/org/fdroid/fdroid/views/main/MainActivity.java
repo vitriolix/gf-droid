@@ -63,6 +63,17 @@ import org.fdroid.fdroid.views.AppDetailsActivity;
 import org.fdroid.fdroid.views.ManageReposActivity;
 import org.fdroid.fdroid.views.apps.AppListActivity;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+
+import android.util.Log;
+import org.greatfire.envoy.*;
+
+import info.guardianproject.netcipher.NetCipher;
+
 /**
  * Main view shown to users upon starting F-Droid.
  * <p>
@@ -98,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
     private MainViewAdapter adapter;
     private BottomNavigationView bottomNavigation;
     private BadgeDrawable updatesBadge;
+
+    // copied from org.greatfire.envoy.NetworkIntentService.kt, could not be found in imported class
+    public static final String BROADCAST_VALID_URL_FOUND = "org.greatfire.envoy.VALID_URL_FOUND";
+    public static final String EXTENDED_DATA_VALID_URLS = "org.greatfire.envoy.VALID_URLS";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,7 +156,27 @@ public class MainActivity extends AppCompatActivity {
         updateableAppsFilter.addAction(AppUpdateStatusManager.BROADCAST_APPSTATUS_REMOVED);
         LocalBroadcastManager.getInstance(this).registerReceiver(onUpdateableAppsChanged, updateableAppsFilter);
 
-        initialRepoUpdateIfRequired();
+        // register to receive valid proxy urls
+        LocalBroadcastManager.getInstance(this).registerReceiver(onUrlsReceived, new IntentFilter(BROADCAST_VALID_URL_FOUND));
+
+        // start shadowsocks service
+        Intent shadowsocksIntent = new Intent(this, ShadowsocksService.class);
+        // put shadowsocks proxy url here, should look like ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpwYXNz@127.0.0.1:1234 (base64 encode user/password)
+        shadowsocksIntent.putExtra("org.greatfire.envoy.START_SS_LOCAL", "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTppZXNvaHZvOHh1Nm9oWW9yaWUydGhhZWhvaFBoOFRoYQ==@172.104.163.54:8388");
+        ContextCompat.startForegroundService(getApplicationContext(), shadowsocksIntent);
+
+        // TODO - initialize one or more string values containing the urls of available http/https proxies (include trailing slash)
+        String httpUrl = "http://162.159.137.85:80/";
+
+        // include shadowsocks local proxy url (submitting local shadowsocks url with no active service may cause an exception)
+        String ssUrl = "socks5://127.0.0.1:1080";  // default shadowsocks url, change if there are port conflicts
+
+        // TODO - it appears that only ip:port format proxies are supported by NetCipher
+        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(httpUrl, ssUrl));  // add all string values to this list value
+        NetworkIntentService.submit(this, possibleUrls);  // submit list of urls to envoy for evaluation
+
+        // delay until after proxy urls have been validated
+        // initialRepoUpdateIfRequired();
 
         Intent intent = getIntent();
         handleSearchOrAppViewIntent(intent);
@@ -448,6 +483,65 @@ public class MainActivity extends AppCompatActivity {
 
                 refreshUpdatesBadge(count);
             }
+        }
+    };
+
+    // this receiver listens for the results from the NetworkIntentService started below
+    // it should receive a result if no valid urls are found but not if the service throws an exception
+    private final BroadcastReceiver onUrlsReceived = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean enableProxy = false;
+
+            if (intent != null && context != null) {
+                ArrayList<String> validUrls = intent.getStringArrayListExtra(EXTENDED_DATA_VALID_URLS);
+                // if there are no valid urls, the proxy setting in preferences will be disabled
+                // currently there is a delay when using gost and the app must be restarted
+                if (validUrls != null && !validUrls.isEmpty()) {
+                    // select the fastest valid option (urls are ordered by latency)
+                    String envoyUrl = validUrls.get(0);
+
+                    Log.d(TAG, "FOUND VALID URL: " + envoyUrl);
+
+                    // format expected: <protocol>://x.x.x.x:y
+                    String[] urlParts = envoyUrl.split(":");
+                    if (urlParts.length != 3) {
+                        Log.d(TAG, "UNEXPECTED URL FORMAT");
+                    } else {
+                        String protocolPart = urlParts[0].toLowerCase(Locale.ROOT);
+                        String hostPart = urlParts[1].replace("//", "");
+                        int portPart = Integer.valueOf(urlParts[2].replace("/", ""));
+
+                        if (protocolPart.startsWith("s")) {
+                            Log.d(TAG, "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
+                            NetCipher.setProxy(new Proxy(Proxy.Type.SOCKS, isa));
+                            enableProxy = true;
+                        } else if (protocolPart.startsWith("h")) {
+                            Log.d(TAG, "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
+                            NetCipher.setProxy(new Proxy(Proxy.Type.HTTP, isa));
+                            enableProxy = true;
+                        } else {
+                            Log.d(TAG, "UNEXPECTED URL PROTOCOL");
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "NO VALID URL FOUND");
+                }
+            }
+
+            Log.d(TAG, "ENABLE/DISABLE");
+
+            if (enableProxy) {
+                Preferences.get().enableProxy();
+            } else {
+                Preferences.get().disableProxy();
+            }
+
+            Log.d(TAG, "NOW DO REPO UPDATE");
+
+            initialRepoUpdateIfRequired();
         }
     };
 }
