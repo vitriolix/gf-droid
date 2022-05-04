@@ -166,13 +166,15 @@ public class MainActivity extends AppCompatActivity {
         ContextCompat.startForegroundService(getApplicationContext(), shadowsocksIntent);
 
         // TODO - initialize one or more string values containing the urls of available http/https proxies (include trailing slash)
-        String httpUrl = "http://162.159.137.85:80/";
+        // TODO - we don't have the ip/port for our http/https proxies that are required by netcipher
+        String httpUrl = "http://";
+        String httpsUrl = "http://";
 
         // include shadowsocks local proxy url (submitting local shadowsocks url with no active service may cause an exception)
         String ssUrl = "socks5://127.0.0.1:1080";  // default shadowsocks url, change if there are port conflicts
 
         // TODO - it appears that only ip:port format proxies are supported by NetCipher
-        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(httpUrl, ssUrl));  // add all string values to this list value
+        ArrayList<String> possibleUrls = new ArrayList<String>(Arrays.asList(ssUrl));  // add all string values to this list value
         NetworkIntentService.submit(this, possibleUrls);  // submit list of urls to envoy for evaluation
 
         // delay until after proxy urls have been validated
@@ -501,37 +503,37 @@ public class MainActivity extends AppCompatActivity {
                     // select the fastest valid option (urls are ordered by latency)
                     String envoyUrl = validUrls.get(0);
 
-                    Log.d(TAG, "FOUND VALID URL: " + envoyUrl);
+                    Log.d(TAG, "found valid proxy url: " + envoyUrl);
 
                     // format expected: <protocol>://x.x.x.x:y
                     String[] urlParts = envoyUrl.split(":");
                     if (urlParts.length != 3) {
-                        Log.d(TAG, "UNEXPECTED URL FORMAT");
+                        Log.e(TAG, "proxy url had an unexpected format");
                     } else {
                         String protocolPart = urlParts[0].toLowerCase(Locale.ROOT);
                         String hostPart = urlParts[1].replace("//", "");
                         int portPart = Integer.valueOf(urlParts[2].replace("/", ""));
 
                         if (protocolPart.startsWith("s")) {
-                            Log.d(TAG, "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            Log.d(TAG, "set netcipher socks proxy: " + protocolPart + " / " + hostPart + " / " + portPart);
                             InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
                             NetCipher.setProxy(new Proxy(Proxy.Type.SOCKS, isa));
                             enableProxy = true;
                         } else if (protocolPart.startsWith("h")) {
-                            Log.d(TAG, "SET NETCIPHER PROXY: " + protocolPart + " / " + hostPart + " / " + portPart);
+                            Log.d(TAG, "set netcipher http proxy: " + protocolPart + " / " + hostPart + " / " + portPart);
                             InetSocketAddress isa = new InetSocketAddress(hostPart, portPart);
                             NetCipher.setProxy(new Proxy(Proxy.Type.HTTP, isa));
                             enableProxy = true;
                         } else {
-                            Log.d(TAG, "UNEXPECTED URL PROTOCOL");
+                            Log.e(TAG, "proxy url had an unexpected protocol");
                         }
                     }
                 } else {
-                    Log.d(TAG, "NO VALID URL FOUND");
+                    Log.e(TAG, "no valid proxy url was found");
                 }
             }
 
-            Log.d(TAG, "ENABLE/DISABLE");
+            Log.d(TAG, "manually enable or disable proxy preference");
 
             if (enableProxy) {
                 Preferences.get().enableProxy();
@@ -539,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
                 Preferences.get().disableProxy();
             }
 
-            Log.d(TAG, "NOW DO REPO UPDATE");
+            Log.d(TAG, "do delayed repo update (if needed)");
 
             initialRepoUpdateIfRequired();
         }
