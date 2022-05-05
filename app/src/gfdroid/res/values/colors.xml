@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- rename these throuout the code to use "primary" instead of "fdroid_blue"-->
+    <color name="fdroid_blue_light">@color/color_primary_alt</color>
+    <color name="fdroid_blue">@color/color_primary</color>
+    <color name="fdroid_blue_dark">#ff004ba0</color>
+    <color name="fdroid_green_light">@color/color_secondary</color>
+    <color name="fdroid_green">@color/color_secondary</color>
+
+    <color name="background">?attr/colorPrimary</color>
+    <color name="color_primary">#361659</color>
+    <color name="color_primary_alt">#673CA7</color>
+    <color name="color_secondary">#F1B807</color>
+    <color name="color_secondary_300">#F2C437</color>
+    <color name="color_secondary_alt">#D98104</color>
+    <color name="color_tertiary">#715163</color>
+
+</resources>
