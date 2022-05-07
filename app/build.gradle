@@ -54,7 +54,6 @@ android {
             minifyEnabled true
             shrinkResources true
             buildConfigField "String", "PRIVILEGED_EXTENSION_PACKAGE_NAME", privilegedExtensionApplicationId
-            buildConfigField "String", "ACRA_REPORT_EMAIL", '"reports@f-droid.org"' // String needs both quotes
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'src/androidTest/proguard-rules.pro'
         }
@@ -171,7 +170,6 @@ dependencies {
     implementation 'info.guardianproject.panic:panic:1.0'
     implementation 'commons-io:commons-io:2.6'
     implementation 'commons-net:commons-net:3.6'
-    implementation 'ch.acra:acra:4.9.1'
     implementation 'com.hannesdorfmann:adapterdelegates3:3.0.1'
 
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'

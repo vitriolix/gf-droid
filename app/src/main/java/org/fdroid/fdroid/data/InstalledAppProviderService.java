@@ -14,7 +14,6 @@ import android.os.Process;
 import android.os.RemoteException;
 import android.util.Log;
 
-import org.acra.ACRA;
 import org.fdroid.fdroid.AppUpdateStatusManager;
 import org.fdroid.fdroid.Utils;
 import org.fdroid.fdroid.data.Schema.InstalledAppTable;
@@ -270,7 +269,6 @@ public class InstalledAppProviderService extends JobIntentService {
             if (files == null) {
                 String msg = packageInfo.packageName + " sourceDir has no APKs: " + apk.getAbsolutePath();
                 Utils.debugLog(TAG, msg);
-                ACRA.getErrorReporter().handleException(new IllegalArgumentException(msg), false);
                 return null;
             }
             apk = files[0];
@@ -303,7 +301,6 @@ public class InstalledAppProviderService extends JobIntentService {
                         insertAppIntoDb(this, packageInfo, hashType, hash);
                     } catch (IllegalArgumentException e) {
                         Utils.debugLog(TAG, e.getMessage());
-                        ACRA.getErrorReporter().handleException(e, false);
                         return;
                     }
                 }

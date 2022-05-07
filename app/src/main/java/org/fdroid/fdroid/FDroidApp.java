@@ -45,10 +45,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
-import org.acra.ACRA;
-import org.acra.ReportField;
-import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
 import org.apache.commons.net.util.SubnetUtils;
 import org.fdroid.fdroid.Preferences.ChangeListener;
 import org.fdroid.fdroid.Preferences.Theme;
@@ -84,30 +80,9 @@ import androidx.core.content.ContextCompat;
 import info.guardianproject.netcipher.NetCipher;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 
-@ReportsCrashes(mailTo = BuildConfig.ACRA_REPORT_EMAIL,
-        mode = ReportingInteractionMode.DIALOG,
-        reportDialogClass = org.fdroid.fdroid.acra.CrashReportActivity.class,
-        reportSenderFactoryClasses = org.fdroid.fdroid.acra.CrashReportSenderFactory.class,
-        customReportContent = {
-                ReportField.USER_COMMENT,
-                ReportField.PACKAGE_NAME,
-                ReportField.APP_VERSION_NAME,
-                ReportField.ANDROID_VERSION,
-                ReportField.PRODUCT,
-                ReportField.BRAND,
-                ReportField.PHONE_MODEL,
-                ReportField.DISPLAY,
-                ReportField.TOTAL_MEM_SIZE,
-                ReportField.AVAILABLE_MEM_SIZE,
-                ReportField.CUSTOM_DATA,
-                ReportField.STACK_TRACE_HASH,
-                ReportField.STACK_TRACE,
-        }
-)
 public class FDroidApp extends Application implements androidx.work.Configuration.Provider {
 
     private static final String TAG = "FDroidApp";
-    private static final String ACRA_ID = BuildConfig.APPLICATION_ID + ":acra";
 
     public static final String SYSTEM_DIR_NAME = Environment.getRootDirectory().getAbsolutePath();
 
@@ -380,10 +355,6 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
         Preferences preferences = Preferences.get();
 
         if (preferences.promptToSendCrashReports()) {
-            ACRA.init(this);
-            if (isAcraProcess() || HidingManager.isHidden(this)) {
-                return;
-            }
         }
 
         PRNGFixes.apply();
@@ -503,37 +474,6 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
         }
     }
 
-    /**
-     * Asks if the current process is "org.fdroid.fdroid:acra".
-     * <p>
-     * This is helpful for bailing out of the {@link FDroidApp#onCreate} method early, preventing
-     * problems that arise from executing the code twice. This happens due to the `android:process`
-     * statement in AndroidManifest.xml causes another process to be created to run
-     * {@link org.fdroid.fdroid.acra.CrashReportActivity}. This was causing lots of things to be
-     * started/run twice including {@link CleanCacheWorker} and {@link WifiStateChangeService}.
-     * <p>
-     * Note that it is not perfect, because some devices seem to not provide a list of running app
-     * processes when asked. In such situations, F-Droid may regress to the behaviour where some
-     * services may run twice and thus cause weirdness or slowness. However that is probably better
-     * for end users than experiencing a deterministic crash every time F-Droid is started.
-     */
-    private boolean isAcraProcess() {
-        ActivityManager manager = ContextCompat.getSystemService(this, ActivityManager.class);
-        List<RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
-        if (processes == null) {
-            return false;
-        }
-
-        int pid = android.os.Process.myPid();
-        for (RunningAppProcessInfo processInfo : processes) {
-            if (processInfo.pid == pid && ACRA_ID.equals(processInfo.processName)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private SharedPreferences getAtStartTimeSharedPreferences() {
         return getSharedPreferences("at-start-time", Context.MODE_PRIVATE);
     }
@@ -571,7 +511,6 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
             className = null;
         } catch (IOException e) {
             Exception toLog = new RuntimeException("Error preparing file to send via Bluetooth", e);
-            ACRA.getErrorReporter().handleException(toLog, false);
         }
 
         if (sendBt != null) {
