@@ -139,6 +139,8 @@ android {
         xmlReport false
         textReport false
 
+        disable "Instantiatable"
+
         lintConfig file("lint.xml")
     }
 
@@ -210,10 +212,8 @@ dependencies {
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
     androidTestImplementation 'androidx.work:work-testing:2.4.0'
 
-    debugImplementation files('libs/cronet-debug.aar')
-    debugImplementation files('libs/envoy-debug.aar')
-    releaseImplementation files('libs/cronet-release.aar')
-    releaseImplementation files('libs/envoy-release.aar')
+    implementation "org.greatfire.envoy:cronet:0.0.100.0.4896.79"
+    implementation "org.greatfire:envoy:0.0.100.0.4896.79"
 }
 
 checkstyle {
