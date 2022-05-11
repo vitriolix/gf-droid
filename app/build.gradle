@@ -21,7 +21,7 @@ def basicApplicationId = "org.greatfire.gfdroid.basic"
 def privilegedExtensionApplicationId = '"org.greatfire.gfdroid.privileged"'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         versionCode 1014050
