@@ -214,6 +214,9 @@ dependencies {
 
     implementation "org.greatfire.envoy:cronet:0.0.100.0.4896.79"
     implementation "org.greatfire:envoy:0.0.100.0.4896.79"
+
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 }
 
 checkstyle {

@@ -3,6 +3,7 @@ package org.fdroid.fdroid.net;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import org.fdroid.fdroid.data.Repo;
 import org.fdroid.fdroid.data.RepoProvider;
@@ -12,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class DownloaderFactory {
+
+    private static final String TAG = "DownloaderFactory";
 
     /**
      * Downloads to a temporary file, which *you must delete yourself when
@@ -41,9 +44,15 @@ public class DownloaderFactory {
             final String[] projection = {Schema.RepoTable.Cols.USERNAME, Schema.RepoTable.Cols.PASSWORD};
             Repo repo = RepoProvider.Helper.findByUrl(context, uri, projection);
             if (repo == null) {
-                downloader = new HttpDownloader(uri, destFile);
+                // NEW
+                // downloader = new HttpDownloader(uri, destFile);
+                Log.d(TAG, "repo is null, get downloader for uri/file: " + uri.toString() + " / " + destFile.getAbsolutePath());
+                downloader = new OkHttpDownloader(uri, destFile);
             } else {
-                downloader = new HttpDownloader(uri, destFile, repo.username, repo.password);
+                // NEW
+                // downloader = new HttpDownloader(uri, destFile, repo.username, repo.password);
+                Log.d(TAG, "repo is not null, get downloader for uri/file: " + uri.toString() + " / " + destFile.getAbsolutePath());
+                downloader = new OkHttpDownloader(uri, destFile, repo.username, repo.password);
             }
         }
         return downloader;

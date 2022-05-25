@@ -345,6 +345,10 @@ This often occurs with apps installed via Google Play or other sources, if they 
     <string name="useTor">Use Tor</string>
     <string name="useTorSummary">Force download traffic through Tor for increased privacy. Requires Orbot</string>
     <string name="proxy">Proxy</string>
+    <string name="proxy_status">Status</string>
+    <string name="proxy_active">Active</string>
+    <string name="proxy_inactive">Inactive</string>
+    <string name="proxy_unknown">Unknown</string>
     <string name="enable_proxy_title">Enable HTTP Proxy</string>
     <string name="enable_proxy_summary">Configure HTTP Proxy for all network requests</string>
     <string name="proxy_host">Proxy Host</string>

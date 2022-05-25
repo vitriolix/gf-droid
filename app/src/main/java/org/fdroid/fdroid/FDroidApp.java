@@ -61,6 +61,7 @@ import org.fdroid.fdroid.nearby.WifiStateChangeService;
 import org.fdroid.fdroid.net.ConnectivityMonitorService;
 import org.fdroid.fdroid.net.Downloader;
 import org.fdroid.fdroid.net.HttpDownloader;
+import org.fdroid.fdroid.net.OkHttpDownloader;
 import org.fdroid.fdroid.panic.HidingManager;
 import org.fdroid.fdroid.work.CleanCacheWorker;
 
@@ -361,7 +362,7 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
 
         applyTheme();
 
-        configureProxy(preferences);
+        //configureProxy(preferences);
 
 
         // bug specific to exactly 5.0 makes it only work with the old index
@@ -447,8 +448,12 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
 
         final String queryStringKey = "http-downloader-query-string";
         if (preferences.sendVersionAndUUIDToServers()) {
-            HttpDownloader.queryString = atStartTime.getString(queryStringKey, null);
-            if (HttpDownloader.queryString == null) {
+            // NEW
+            // HttpDownloader.queryString = atStartTime.getString(queryStringKey, null);
+            // if (HttpDownloader.queryString == null) {
+            OkHttpDownloader.queryString = atStartTime.getString(queryStringKey, null);
+            Log.d(TAG, "set query string: " + OkHttpDownloader.queryString);
+            if (OkHttpDownloader.queryString == null) {
                 UUID uuid = UUID.randomUUID();
                 ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE / Byte.SIZE * 2);
                 buffer.putLong(uuid.getMostSignificantBits());
@@ -460,10 +465,16 @@ public class FDroidApp extends Application implements androidx.work.Configuratio
                 if (versionName != null) {
                     builder.append("&client_version=").append(versionName);
                 }
-                HttpDownloader.queryString = builder.toString();
+                // NEW
+                // HttpDownloader.queryString = builder.toString();
+                OkHttpDownloader.queryString = builder.toString();
+                Log.d(TAG, "null, reset query string: " + OkHttpDownloader.queryString);
             }
             if (!atStartTime.contains(queryStringKey)) {
-                atStartTime.edit().putString(queryStringKey, HttpDownloader.queryString).apply();
+                // NEW
+                // atStartTime.edit().putString(queryStringKey, HttpDownloader.queryString).apply();
+                atStartTime.edit().putString(queryStringKey, OkHttpDownloader.queryString).apply();
+                Log.d(TAG, "set shared preference query string: " + OkHttpDownloader.queryString);
             }
         } else {
             atStartTime.edit().remove(queryStringKey).apply();

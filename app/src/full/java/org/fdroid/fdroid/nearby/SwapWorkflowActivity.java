@@ -55,6 +55,7 @@ import org.fdroid.fdroid.nearby.peers.Peer;
 import org.fdroid.fdroid.net.BluetoothDownloader;
 import org.fdroid.fdroid.net.Downloader;
 import org.fdroid.fdroid.net.HttpDownloader;
+import org.fdroid.fdroid.net.OkHttpDownloader;
 import org.fdroid.fdroid.qr.CameraCharacteristicsChecker;
 import org.fdroid.fdroid.views.main.MainActivity;
 
@@ -466,7 +467,10 @@ public class SwapWorkflowActivity extends AppCompatActivity {
             return;
         }
         Uri uri = intent.getData();
-        if (uri != null && !HttpDownloader.isSwapUrl(uri) && !BluetoothDownloader.isBluetoothUri(uri)) {
+        // NEW
+        // if (uri != null && !HttpDownloader.isSwapUrl(uri) && !BluetoothDownloader.isBluetoothUri(uri)) {
+        Log.d(TAG, "check swap uri: " + OkHttpDownloader.isSwapUrl(uri));
+        if (uri != null && !OkHttpDownloader.isSwapUrl(uri) && !BluetoothDownloader.isBluetoothUri(uri)) {
             String msg = getString(R.string.swap_toast_invalid_url, uri);
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             return;
